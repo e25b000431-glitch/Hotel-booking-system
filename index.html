@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bayview Hotel: Book a room</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f2f4f1;--surface:#fff;--ink:#13242b;--muted:#5b6b71;--line:#d3dbd7;--accent:#1d6a73;--on-accent:#fff;--brass:#9a6b1f;--danger:#a63a2e;--taken:#e7eae7;color-scheme:light;
+ box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1a1f;--surface:#16252c;--ink:#e8eeec;--muted:#96a6aa;--line:#2b3c43;--accent:#5fb3bc;--on-accent:#0b1519;--brass:#d9a95a;--danger:#e57a6c;--taken:#1b2c33;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1a1f;--surface:#16252c;--ink:#e8eeec;--muted:#96a6aa;--line:#2b3c43;--accent:#5fb3bc;--on-accent:#0b1519;--brass:#d9a95a;--danger:#e57a6c;--taken:#1b2c33;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 "Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:1040px;margin:0 auto;padding:28px 18px 56px}
+h1,h2,.num{font-family:Fraunces,Georgia,"Times New Roman",serif}
+h1{font-size:clamp(2rem,6vw,3.2rem);line-height:1.05;margin:0 0 6px;font-weight:700;letter-spacing:-.01em}
+h2{font-size:1.25rem;margin:0 0 12px;font-weight:700}
+.sub{margin:0 0 26px;color:var(--muted);max-width:52ch}
+.layout{display:grid;gap:26px;align-items:start}
+@media (min-width:860px){.layout{grid-template-columns:320px 1fr}aside{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px)}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;margin-bottom:16px}
+label{display:block;font-size:.9rem;font-weight:500;margin-bottom:12px}
+input{display:block;width:100%;margin-top:4px;padding:10px 11px;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px}
+input:focus-visible,button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.dates{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hint{color:var(--muted);font-size:.92rem;margin:0}
+.hint strong{color:var(--ink)}
+.btn{font:600 1rem "Instrument Sans",system-ui,sans-serif;padding:11px 16px;border-radius:6px;border:1px solid var(--accent);background:var(--accent);color:var(--on-accent);cursor:pointer;width:100%}
+.btn.ghost{background:transparent;color:var(--accent);width:auto;padding:6px 10px;font-size:.88rem}
+.btn.warn{border-color:var(--danger);color:var(--danger)}
+#msg{min-height:1.5em;font-weight:500;margin:0 2px}
+#msg.err{color:var(--danger)}
+.floor-h{display:flex;align-items:baseline;justify-content:space-between;margin:0 0 10px}
+.floor-h span{color:var(--muted);font-size:.9rem}
+.floor{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px;margin-bottom:28px}
+.room{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:2px;padding:12px 14px;min-height:112px;background:var(--surface);color:var(--ink);border:1.5px solid var(--accent);border-radius:4px 4px 14px 14px;font:inherit;cursor:pointer}
+.room .num{font-size:2rem;font-weight:700;line-height:1}
+.room .type{font-weight:600;margin-top:4px}
+.room .rate{color:var(--muted);font-size:.88rem}
+.room .state{margin-top:auto;font-size:.82rem;font-weight:600;color:var(--accent)}
+.room[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+.room[aria-pressed="true"] .rate,.room[aria-pressed="true"] .state{color:var(--on-accent)}
+.room:disabled{cursor:not-allowed;background:var(--taken);border:1.5px dashed var(--line);color:var(--muted)}
+.room:disabled .state{color:var(--brass)}
+.room.idle{border-color:var(--line)}
+.room.idle .state{color:var(--muted)}
+.ledger{margin-top:8px}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{width:100%;border-collapse:collapse;min-width:640px;font-size:.95rem}
+th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-weight:600;color:var(--muted);font-size:.88rem}
+tr:last-child td{border-bottom:0}
+td.t{font-weight:600;font-variant-numeric:tabular-nums}
+.empty{padding:22px;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.room{transition:background .15s,color .15s}}
+</style>
+</head>
+<body>
+<main>
+  <h1>Bayview Hotel</h1>
+  <p class="sub">Choose your dates, pick a free room from the key rack, then add your details to confirm.</p>
+
+  <div class="layout">
+    <aside>
+      <section class="panel" aria-labelledby="h-stay">
+        <h2 id="h-stay">Your stay</h2>
+        <div class="dates">
+          <label>Check-in<input type="date" id="in"></label>
+          <label>Check-out<input type="date" id="out"></label>
+        </div>
+        <p class="hint" id="stay"></p>
+      </section>
+
+      <section class="panel" aria-labelledby="h-guest">
+        <h2 id="h-guest">Guest details</h2>
+        <p class="hint" id="pick">Select a free room to continue.</p>
+        <form id="bf" hidden autocomplete="off">
+          <p class="hint" id="sel" style="margin-bottom:14px"></p>
+          <label>Full name<input id="name" required maxlength="60"></label>
+          <label>Phone<input id="phone" type="tel" required maxlength="20" inputmode="tel"></label>
+          <button class="btn" type="submit" id="go">Confirm booking</button>
+        </form>
+      </section>
+      <p id="msg" role="status" aria-live="polite"></p>
+    </aside>
+
+    <section aria-label="Rooms" id="rack"></section>
+  </div>
+
+  <section class="ledger" aria-labelledby="h-led">
+    <h2 id="h-led">Bookings</h2>
+    <div class="scroll" id="ledger"></div>
+  </section>
+</main>
+
+<script>
+(function(){
+  var ROOMS=[], FLOORS=["First floor","Second floor","Third floor"];
+  [101,102,103,104].forEach(function(n){ROOMS.push({no:n,type:"Single",rate:3000})});
+  [201,202,203,204].forEach(function(n){ROOMS.push({no:n,type:"Double",rate:5000})});
+  [301,302].forEach(function(n){ROOMS.push({no:n,type:"Suite",rate:9000})});
+
+  var KEY="bayview.bookings.v1", bookings=[], selected=null, armed=null, armTimer=null;
+  var $=function(id){return document.getElementById(id)};
+  var money=function(n){return "₹"+n.toLocaleString("en-IN",{maximumFractionDigits:0})};
+  var esc=function(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})};
+
+  function load(){try{var r=localStorage.getItem(KEY);var a=r?JSON.parse(r):[];if(Array.isArray(a))bookings=a}catch(e){bookings=[]}}
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(bookings))}catch(e){}}
+
+  function dn(s){var p=s.split("-").map(Number);return Date.UTC(p[0],p[1]-1,p[2])/86400000}
+  function iso(d){var m=d.getMonth()+1,day=d.getDate();return d.getFullYear()+"-"+(m<10?"0":"")+m+"-"+(day<10?"0":"")+day}
+  function fmtDate(s){var p=s.split("-").map(Number);return new Date(p[0],p[1]-1,p[2]).toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"})}
+  function range(){var a=$("in").value,b=$("out").value;if(!a||!b)return null;var x=dn(a),y=dn(b);return y>x?{a:a,b:b,nights:y-x}:null}
+  function free(no,r){return !bookings.some(function(k){return k.active&&k.room===no&&dn(r.a)<dn(k.out)&&dn(k.in)<dn(r.b)})}
+  function room(no){return ROOMS.filter(function(r){return r.no===no})[0]}
+  function say(t,err){var m=$("msg");m.textContent=t;m.className=err?"err":""}
+
+  function render(){
+    var r=range(), stay=$("stay");
+    stay.innerHTML=r?"<strong>"+r.nights+(r.nights===1?" night":" nights")+"</strong> from "+fmtDate(r.a)+" to "+fmtDate(r.b)+".":"Check-out must be after check-in.";
+    if(selected&&(!r||!free(selected,r)))selected=null;
+
+    var html="";
+    [1,2,3].forEach(function(f){
+      var rs=ROOMS.filter(function(x){return Math.floor(x.no/100)===f});
+      var open=r?rs.filter(function(x){return free(x.no,r)}).length:null;
+      html+='<div class="floor-h"><h2>'+FLOORS[f-1]+'</h2><span>'+(open===null?"":open+" of "+rs.length+" free")+'</span></div><div class="floor">';
+      rs.forEach(function(x){
+        var ok=r&&free(x.no,r), on=selected===x.no;
+        html+='<button type="button" class="room'+(r?"":" idle")+'" data-no="'+x.no+'" aria-pressed="'+on+'"'+(r&&!ok?" disabled":"")+(r?"":" disabled")+'>'+
+          '<span class="num">'+x.no+'</span><span class="type">'+x.type+'</span><span class="rate">'+money(x.rate)+' a night</span>'+
+          '<span class="state">'+(!r?"Set dates":ok?(on?"Selected":"Free"):"Booked")+'</span></button>';
+      });
+      html+="</div>";
+    });
+    $("rack").innerHTML=html;
+
+    var f=$("bf"),pk=$("pick");
+    if(selected&&r){
+      var rm=room(selected);
+      f.hidden=false;pk.hidden=true;
+      $("sel").innerHTML="Room <strong>"+rm.no+"</strong> ("+rm.type+"), "+r.nights+(r.nights===1?" night":" nights")+" at "+money(rm.rate)+": <strong>"+money(rm.rate*r.nights)+"</strong>";
+    }else{f.hidden=true;pk.hidden=false}
+
+    renderLedger();
+  }
+
+  function renderLedger(){
+    var act=bookings.filter(function(k){return k.active});
+    if(!act.length){$("ledger").innerHTML='<p class="empty">No bookings yet. Your confirmed stays will appear here.</p>';return}
+    var h='<table><thead><tr><th>ID</th><th>Room</th><th>Guest</th><th>Stay</th><th>Nights</th><th>Total</th><th><span class="sr" style="position:absolute;left:-9999px">Actions</span></th></tr></thead><tbody>';
+    act.forEach(function(k){
+      var rm=room(k.room), n=dn(k.out)-dn(k.in), isA=armed===k.id;
+      h+="<tr><td>#"+k.id+"</td><td>"+k.room+" ("+rm.type+")</td><td>"+esc(k.name)+"<br><span class=\"hint\">"+esc(k.phone)+"</span></td><td>"+fmtDate(k.in)+" to "+fmtDate(k.out)+"</td><td>"+n+"</td><td class=\"t\">"+money(rm.rate*n)+"</td>"+
+        '<td><button type="button" class="btn ghost warn" data-cancel="'+k.id+'">'+(isA?"Tap again to cancel":"Cancel booking")+"</button></td></tr>";
+    });
+    $("ledger").innerHTML=h+"</tbody></table>";
+  }
+
+  $("rack").addEventListener("click",function(e){
+    var b=e.target.closest(".room");if(!b||b.disabled)return;
+    var no=+b.dataset.no;selected=selected===no?null:no;say("");render();
+    if(selected)$("name").focus();
+  });
+
+  $("ledger").addEventListener("click",function(e){
+    var b=e.target.closest("[data-cancel]");if(!b)return;
+    var id=+b.dataset.cancel;
+    if(armed!==id){armed=id;clearTimeout(armTimer);armTimer=setTimeout(function(){armed=null;renderLedger()},4000);renderLedger();return}
+    bookings.forEach(function(k){if(k.id===id)k.active=false});
+    armed=null;save();say("Booking #"+id+" cancelled.");render();
+  });
+
+  $("bf").addEventListener("submit",function(e){
+    e.preventDefault();
+    var r=range(), name=$("name").value.trim(), phone=$("phone").value.trim();
+    if(!r||!selected){say("Choose valid dates and a room first.",true);return}
+    if(!name){say("Enter the guest’s full name.",true);return}
+    if(phone.replace(/\D/g,"").length<7){say("Enter a phone number with at least 7 digits.",true);return}
+    if(!free(selected,r)){say("Room "+selected+" was just taken for those dates. Pick another room.",true);selected=null;render();return}
+    var id=bookings.reduce(function(m,k){return Math.max(m,k.id)},0)+1, rm=room(selected);
+    bookings.push({id:id,room:selected,name:name,phone:phone,in:r.a,out:r.b,active:true});
+    save();
+    say("Booked: room "+selected+" for "+name+", "+r.nights+(r.nights===1?" night":" nights")+", total "+money(rm.rate*r.nights)+". Booking ID #"+id+".");
+    selected=null;$("name").value="";$("phone").value="";render();
+  });
+
+  ["in","out"].forEach(function(id){$(id).addEventListener("change",function(){
+    if(id==="in"&&$("in").value){
+      $("out").min=$("in").value;
+      if(!$("out").value||dn($("out").value)<=dn($("in").value)){var p=$("in").value.split("-").map(Number);$("out").value=iso(new Date(p[0],p[1]-1,p[2]+1))}
+    }
+    say("");render();
+  })});
+
+  var t=new Date(), tomorrow=new Date(t.getFullYear(),t.getMonth(),t.getDate()+1), after=new Date(t.getFullYear(),t.getMonth(),t.getDate()+3);
+  $("in").min=iso(t);$("in").value=iso(tomorrow);$("out").min=iso(tomorrow);$("out").value=iso(after);
+  load();render();
+})();
+</script>
+</body>
+</html>
